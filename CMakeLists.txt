@@ -18,6 +18,8 @@ add_custom_command(
     DEPENDS lemon lempar.c
 )
 
+add_subdirectory(RE-flex)
+
 add_library(gjson 
     gjson.cpp gjson.h ${GEN_SOURCES}
 )
