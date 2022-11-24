@@ -4,7 +4,8 @@ project (gjson VERSION 0.1)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(lemon lemon.c)
+
+add_executable(lemon ${CMAKE_CURRENT_SOURCE_DIR}/sqlite/tool/lemon.c)
 
 SET(GEN_SOURCES
     ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp
@@ -13,9 +14,8 @@ SET(GEN_SOURCES
 
 add_custom_command(
     OUTPUT ${GEN_SOURCES}
-    COMMAND lemon -T${CMAKE_CURRENT_SOURCE_DIR}/lempar.c -d${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/parser.y
+    COMMAND lemon -T${CMAKE_CURRENT_SOURCE_DIR}/sqlite/tool/lempar.c -d${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/parser.y
     COMMAND mv ${CMAKE_CURRENT_BINARY_DIR}/parser.c ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp
-    DEPENDS lemon lempar.c
 )
 
 add_subdirectory(RE-flex)
