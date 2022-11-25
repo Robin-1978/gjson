@@ -1,66 +1,55 @@
-/* Copyright (GPL) 2004 mchirico@users.sourceforge.net or mchirico@comcast.net
 
-  Simple lemon parser  example.
-
-  
-    $ ./lemon example1.y                          
-
-  The above statement will create example1.c.
-
-  The command below  adds  main and the
-  necessary "Parse" calls to the
-  end of this example1.c.
-
-
-    $ cat <<EOF >>example1.c                      
-    int main()                                    
-    {                                             
-      void* pParser = ParseAlloc (malloc);        
-      Parse (pParser, INTEGER, 1);                
-      Parse (pParser, PLUS, 0);                   
-      Parse (pParser, INTEGER, 2);                
-      Parse (pParser, 0, 0);                      
-      ParseFree(pParser, free );                  
-     }                                            
-    EOF                                           
-            
-
-     $ g++ -o ex1 example1.c                                      
-     $ ./ex1
-
-  See the Makefile, as most all of this is
-  done automatically.
-  
-  Downloads:
-  http://prdownloads.sourceforge.net/souptonuts/lemon_examples.tar.gz?download
-
-*/
-
-%token_type {int}  
-   
-%left PLUS MINUS.   
-%left DIVIDE TIMES.  
-   
 %include {   
 #include <iostream>
+#include "lexer.h"
+
 }  
-   
+
+%token_type {Token *}  
+%type expr { int }
+
+%left PLUS MINUS.   
+%left DIVIDE TIMES.  
+%left LPAR RPAR.
+%right NOT.
+
+
+%extra_argument { std::map<std::wstring, double>* memory }
+
 %syntax_error {  
   std::cout << "Syntax error!" << std::endl;  
 }   
-   
-program ::= expr(A).   { std::cout << "Result=" << A << std::endl; }  
-   
+%parse_failure {
+  std::cout << "Parse failure!" << std::endl; 
+}
+
+stm ::= expr(A). {std::cout << "Result=" << A << std::endl;}
+stm ::= IDENTIFIER(A) ASSIGN expr(B). {
+  (*memory)[A->str] = B;
+}
+
+
+expr(A) ::= LPAR expr(B) RPAR. { A = B; }
 expr(A) ::= expr(B) MINUS  expr(C).   { A = B - C; }  
 expr(A) ::= expr(B) PLUS  expr(C).   { A = B + C; }  
 expr(A) ::= expr(B) TIMES  expr(C).   { A = B * C; }  
 expr(A) ::= expr(B) DIVIDE expr(C).  { 
-
          if(C != 0){
            A = B / C;
           }else{
            std::cout << "divide by zero" << std::endl;
            }
 }  /* end of DIVIDE */
+expr(A) ::= IDENTIFIER(B). { 
+  auto it = memory->find(B->str);
+  if(it != memory->end())
+  {
+    A = it->second;
+  }
+  else{
+    std::wcout << "Variable not found(" << B->str << ")" << std::endl;
+  }
+}
 
-expr(A) ::= INTEGER(B). { A = B; } 
+expr(A) ::= INTEGER(B). { A = B->value; } 
+expr(A) ::= MINUS INTEGER(B). [NOT] { A = - B->value; } 

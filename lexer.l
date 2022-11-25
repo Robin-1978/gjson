@@ -1,15 +1,3 @@
-// An interactive calculator with Unicode identifier variables
-// Builds with bison-bridge to pass Lexer object 'lexer' to bison parser
-// $ reflex calc.l
-// $ bison -y -d calc.y
-// $ c++ -o calc y.tab.c lex.yy.cpp -lreflex
-// Example:
-// $ ./calc
-// π = 3.14
-// => 3.14
-// π/2
-// => 1.57
-
 %top{
   #include <cstdlib>
   #include <string>
@@ -19,6 +7,7 @@
   //class REFLEX_OPTION_lexer;  // = %option lexer (which is 'Lexer' by default)
 
   #include "parser.h"
+  #include "../jparser.h"
 }
 
 %{
@@ -26,9 +15,8 @@
 %}
 
 %class{
- private:
-  std::wstring                  var;
-  double num;
+ public:
+  Token token;
 }
 
 %option fast unicode freespace
@@ -39,13 +27,16 @@ num    \d* (\d | \.\d | \d\.) \d* {exp}?
 
 %%
 
-{var}        { var = wstr(); return 'V'; }
-{num}        { num = strtod(text(), NULL); return 'N'; }
+{var}        { token.str = wstr(); return IDENTIFIER; }
+{num}        { token.value = strtod(text(), NULL); return INTEGER; }
 "-"          { return MINUS; }
-"+" { return PLUS; }
-"*" { return TIMES; }
-"/" { return DIVIDE; }
+"+"          { return PLUS; }
+"*"          { return TIMES; }
+"/"          { return DIVIDE; }
+"("          { return LPAR; }
+")"          { return RPAR; }
+"="          { return ASSIGN;}
 \s           // ignore space
-.            { yyerror(this, "mystery character"); }
+.            { std::cout<<"mystery character"; }
 
 %%
