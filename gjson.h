@@ -1,6 +1,5 @@
 #pragma once
 
-#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -16,20 +15,28 @@ enum class  Type{
     Float = 4,
     Object = 5,
     Array = 6,
+    Null = 7,
 } ;
 
 struct Value
 {
     virtual ~Value() = default;
-    using ptr = std::unique_ptr<Value>;
     virtual Type GetType() const {return Type::Unknown;}
+};
+
+struct Null : Value
+{
+    using value_t = std::nullptr_t;
+    enum Type GetType() const override {return Type::Null;}
 };
 
 struct Bool : Value
 {
-    virtual ~Bool() = default;
-    using ptr = std::unique_ptr<Bool>;
     using value_t = bool;
+    
+    Bool(value_t value) : value(value){};
+    virtual ~Bool() = default;
+
 
     enum Type GetType() const override {return Type::Bool;}
 
@@ -38,9 +45,11 @@ struct Bool : Value
 
 struct String : Value
 {
+    using value_t = std::wstring;
+
+    String(const value_t& value) : value(value){};
     virtual ~String() = default;
-    using ptr = std::unique_ptr<String>;
-    using value_t = std::string;
+
     enum Type GetType() const override {return Type::String;}
 
     value_t value;
@@ -48,9 +57,9 @@ struct String : Value
 
 struct Integer : Value
 {
-    virtual ~Integer() = default;
-    using ptr = std::unique_ptr<Integer>;
     using value_t = long long;
+    Integer(const value_t& value) : value(value){};
+    virtual ~Integer() = default;
     enum Type GetType() const override {return Type::Integer;}
 
     value_t value;
@@ -58,9 +67,9 @@ struct Integer : Value
 
 struct Float : Value
 {
-    virtual ~Float() = default;
-    using ptr = std::unique_ptr<Float>;
     using value_t = double;
+    Float(const value_t& value) : value(value){};
+    virtual ~Float() = default;
     enum Type GetType() const override {return Type::Float;}
 
     value_t value;
@@ -68,9 +77,16 @@ struct Float : Value
 
 struct Object : Value
 {
-    virtual ~Object() = default;
-    using ptr = std::unique_ptr<Object>;
-    using value_t = std::unordered_map<std::string, Value::ptr>;
+    virtual ~Object()
+    {
+        for(auto &o : value)
+        {
+            delete o.second;
+            o.second = nullptr;
+        }
+        value.clear();
+    }
+    using value_t = std::unordered_map<std::wstring, Value *>;
     enum Type GetType() const override {return Type::Object;}
     value_t value;
 
@@ -85,10 +101,17 @@ struct Object : Value
 
 struct Array : Value
 {
-    virtual ~Array() = default;
+    virtual ~Array()
+    {
+        for(auto &o : value)
+        {
+            delete o;
+            o = nullptr;
+        }
+        value.clear();
+    }
 
-    using ptr = std::unique_ptr<Array>;
-    using value_t = std::vector<Value::ptr>;
+    using value_t = std::vector<Value*>;
     enum Type GetType() const override {return Type::Array;}
 
     value_t value;

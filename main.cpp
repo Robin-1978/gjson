@@ -1,7 +1,6 @@
 #include <iostream>
 
-#include "gjson.h"
-#include "jparser.h"
+#include "calc.h"
 
 int main()
 {

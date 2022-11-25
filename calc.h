@@ -8,6 +8,7 @@ struct Token
 {
 std::wstring str;
 double value;
+int line, column;
 };
 
 class Calc

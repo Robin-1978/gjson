@@ -7,7 +7,7 @@
   //class REFLEX_OPTION_lexer;  // = %option lexer (which is 'Lexer' by default)
 
   #include "parser.h"
-  #include "../jparser.h"
+  #include "../calc.h"
 }
 
 %{
@@ -35,7 +35,8 @@ num    \d* (\d | \.\d | \d\.) \d* {exp}?
 "/"          { return DIVIDE; }
 "("          { return LPAR; }
 ")"          { return RPAR; }
-"="          { return ASSIGN;}
+"="          { return ASSIGN; }
+\"           { return 0; }
 \s           // ignore space
 .            { std::cout<<"mystery character"; }
 
