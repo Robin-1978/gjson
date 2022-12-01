@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_executable(lemon ${CMAKE_CURRENT_SOURCE_DIR}/sqlite/tool/lemon.c)
 add_subdirectory(RE-flex)
-add_definitions("-g")
+add_definitions("-g") 
 
 SET(GEN_PARSER
     ${CMAKE_CURRENT_BINARY_DIR}/parser.c
