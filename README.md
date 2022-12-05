@@ -1,5 +1,5 @@
 # gjson
 
-Example for RE/flex lemon parser
+Example of RE/flex and lemon parser
 
 ---
