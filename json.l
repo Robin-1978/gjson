@@ -26,20 +26,20 @@ number  {int} {frac} {exp}?
 
 %%
 
-[ \t\n\r]+      { /* ignore white space */ }
-"["             { return LBRACKET; }
-"]"             { return RBRACKET; }  
-"{"             { return LBRACE; }
-"}"             { return RBRACE;}
-","             { return COMMA; }
-":"             { return COLON; }
+[ \t\n\r]+              { /* ignore white space */ }
+"["                     { return LBRACKET; }
+"]"                     { return RBRACKET; }  
+"{"                     { return LBRACE; }
+"}"                     { return RBRACE;}
+","                     { return COMMA; }
+":"                     { return COLON; }
 
-null            { return NIL; }
-true            { return TRUE; }
-false           { return FALSE; }
-{int}           { token.iv = strtoll(text(), NULL, 10); return INTEGER;}
-{number}        { token.fv = strtod(text(), NULL); return FLOAT; }
-\"              { token.sv = new gjson::String::value_t; token.sv->reserve(128); start(STR); }
+null                    { return NIL; }
+true                    { return TRUE; }
+false                   { return FALSE; }
+{int}                   { token.iv = strtoll(text(), NULL, 10); return INTEGER;}
+{number}                { token.fv = strtod(text(), NULL); return FLOAT; }
+\"                      { token.sv = new gjson::String::value_t; token.sv->reserve(128); start(STR); }
 
 <STR>{
 \"                      { start(INITIAL); return STRING; }

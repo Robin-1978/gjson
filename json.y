@@ -16,7 +16,13 @@
 %extra_argument {gjson::Statement* statement}
 
 %syntax_error {  
-  std::cout << "Syntax error!" << std::endl;  
+  std::cout << "Syntax error token:" << yymajor << std::endl;  
+  for (int i = 0; i < YYNTOKEN; ++i) {
+          int act = yy_find_shift_action((YYCODETYPE)i, yypParser->yytos->stateno);
+          if (act != YY_ERROR_ACTION) {
+            printf("possible token: %d \n", i);
+          }
+  }
 }   
 %parse_failure {
   std::cout << "Parse failure!" << std::endl; 

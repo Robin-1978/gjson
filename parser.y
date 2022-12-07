@@ -17,7 +17,17 @@
 %extra_argument { std::map<std::wstring, double>* memory }
 
 %syntax_error {  
-  std::cout << "Syntax error!" << std::endl;  
+  //yymajor
+  //yyminor
+  std::cout << "Syntax error!" << yymajor << std::endl;  
+  int n = YYNTOKEN;
+  for (int i = 0; i < n; ++i) {
+          int a = yy_find_shift_action((YYCODETYPE)i, yypParser->yytos->stateno);
+          if (a != YY_ERROR_ACTION) {
+            //printf("possible token: %s\n", yyTokenName[i]);
+            printf("possible token: %d \n", i);
+          }
+  }
 }   
 %parse_failure {
   std::cout << "Parse failure!" << std::endl; 
